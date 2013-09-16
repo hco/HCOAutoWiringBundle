@@ -1,0 +1,24 @@
+{
+    "name": "hco/auto-wiring-bundle",
+    "autoload": {
+        "classmap": ["."]
+    },
+    "require": {
+        "doctrine/annotations": "1.1.2",
+        "symfony/dependency-injection": "2.3",
+        "symfony/config": "2.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7"
+    },
+    "license": "MIT",
+    "config": {
+        "bin-dir": "bin"
+    },
+    "authors": [
+        {
+            "name": "Hans-Christian Otto",
+            "email": "c.otto@lab9.de"
+        }
+    ]
+}
