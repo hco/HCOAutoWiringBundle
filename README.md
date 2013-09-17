@@ -89,7 +89,7 @@ class ServiceWithDependency
 <service id="bar" class="StdClass">
 </service>
 <service id="baz" class="StdClass">
-<tag name="hco.autowire.qualifier" qualifier="readonly" />
+    <tag name="hco.autowire.qualifier" qualifier="readonly" />
 </service>
 ```
 This will injcet the service *baz* into the service *foobar*, as *baz* is qualified as *readonly*.
