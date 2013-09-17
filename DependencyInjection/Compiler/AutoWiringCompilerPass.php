@@ -29,39 +29,19 @@ class AutoWiringCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        /** @var AnnotationReader $annotationReader */
         $annotationReader = $container->get('annotation_reader');
 
-        $taggedServices = $container->findTaggedServiceIds(
-            'hco.autowire'
-        );
+        $autoWiredServices  = $this->findAutoWiredServices($container);
         $dependencyRegistry = $this->buildDependencyRegistry($container);
 
-        foreach ($taggedServices as $serviceId => $tagAttributes) {
+        foreach ($autoWiredServices as $serviceId) {
             $definition = $container->getDefinition($serviceId);
             $class      = new \ReflectionClass($definition->getClass());
             $container->addResource(new FileResource($class->getFileName()));
 
-            $newArguments = array();
-
-            $qualifiers = $this->getQualifiersForParameters($annotationReader, $class);
-
-            foreach ($class->getConstructor()->getParameters() as $parameter) {
-                if (isset($qualifiers[$parameter->getName()])) {
-                    $newArguments[] = new Reference(
-                        $dependencyRegistry->findQualified(
-                            $parameter->getClass()->getName(),
-                            $qualifiers[$parameter->getName()]
-                        )
-                    );
-                } else {
-                    $newArguments[] = new Reference(
-                        $dependencyRegistry->findUnqualified($parameter->getClass()->getName())
-                    );
-                }
-            }
-
-            $definition->setArguments($newArguments);
+            $definition->setArguments(
+                $this->getAutowiredArguments($annotationReader, $class, $dependencyRegistry)
+            );
         }
     }
 
@@ -133,6 +113,55 @@ class AutoWiringCompilerPass implements CompilerPassInterface
             }
         }
         return $dependencyRegistry;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     */
+    public function findAutoWiredServices(ContainerBuilder $container)
+    {
+        return array_keys(
+            $container->findTaggedServiceIds(
+                'hco.autowire'
+            )
+        );
+    }
+
+    /**
+     * @param AnnotationReader $annotationReader
+     * @param \ReflectionClass $class
+     * @param DependencyRegistry $dependencyRegistry
+     *
+     * @return array
+     */
+    private function getAutowiredArguments(
+        AnnotationReader $annotationReader,
+        \ReflectionClass $class,
+        DependencyRegistry $dependencyRegistry
+    ) {
+        $newArguments = array();
+
+        $qualifiers = $this->getQualifiersForParameters($annotationReader, $class);
+
+        foreach ($class->getConstructor()->getParameters() as $parameter) {
+            if (isset($qualifiers[$parameter->getName()])) {
+                // Parameter is qualified
+                $newArguments[] = new Reference(
+                    $dependencyRegistry->findQualified(
+                        $parameter->getClass()->getName(),
+                        $qualifiers[$parameter->getName()]
+                    )
+                );
+            } else {
+                // Parameter is not qualified
+                $newArguments[] = new Reference(
+                    $dependencyRegistry->findUnqualified($parameter->getClass()->getName())
+                );
+            }
+        }
+        return $newArguments;
     }
 }
 
