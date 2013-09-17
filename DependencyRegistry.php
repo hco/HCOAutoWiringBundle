@@ -19,7 +19,7 @@ class DependencyRegistry
      * @param $serviceId
      * @param string $qualifier
      */
-    public function register($className, $serviceId, $qualifier = null)
+    public function register($className, $serviceId, $qualifier = null, $primary = false)
     {
         if (!isset($this->storage[$className])) {
             $this->storage[$className] = array(
@@ -33,6 +33,21 @@ class DependencyRegistry
         if ($qualifier !== null) {
             $this->registerQualified($className, $serviceId, $qualifier);
         }
+
+        if($primary) {
+            if(isset($this->storage[$className]['primary'])) {
+                throw new Exception(
+                    sprintf(
+                        'Multiple primary services registered for class %s: %s and %s',
+                        $className,
+                        $serviceId,
+                        $this->storage[$className]['primary']
+                    )
+                );
+            }
+
+            $this->storage[$className]['primary'] = $serviceId;
+        }
     }
 
 
@@ -45,6 +60,10 @@ class DependencyRegistry
                     $className
                 )
             );
+        }
+
+        if(isset($this->storage[$className]['primary'])) {
+            return $this->storage[$className]['primary'];
         }
 
         if (count($this->storage[$className]['unqualified']) !== 1) {

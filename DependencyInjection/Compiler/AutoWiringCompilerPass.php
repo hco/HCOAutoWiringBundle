@@ -35,13 +35,13 @@ class AutoWiringCompilerPass implements CompilerPassInterface
                     new \ReflectionClass($className),
                     'HCO\AutoWiringBundle\Annotation\Qualifier'
                 );
-                $tag = $definition->getTag('hco.autowire.qualifier');
-                if (count($tag) === 0 ) {
-                    $dependencyRegistry->register($providingClassName, $serviceId);
-                } else {
-                    $tag = reset($tag);
-                    $dependencyRegistry->register($providingClassName, $serviceId, $tag['qualifier']);
-                }
+
+                $qualifierTags = $definition->getTag('hco.autowire.qualifier');
+                $primaryTags = $definition->getTag('hco.autowire.primary');
+                $isPrimary = count($primaryTags) > 0;
+                $qualifier = count($qualifierTags) > 0 ? reset($qualifierTags)['qualifier'] : null;
+
+                $dependencyRegistry->register($providingClassName, $serviceId, $qualifier, $isPrimary);
             }
         }
 
