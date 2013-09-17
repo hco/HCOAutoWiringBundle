@@ -29,33 +29,13 @@ class AutoWiringCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $dependencyRegistry = new DependencyRegistry();
         /** @var AnnotationReader $annotationReader */
         $annotationReader = $container->get('annotation_reader');
-
-        foreach ($container->getDefinitions() as $serviceId => $definition) {
-            $className = $container->getParameterBag()->resolveValue(
-                $definition->getClass()
-            );
-
-            if ($className === null) {
-                continue;
-            }
-
-            class_exists($className);
-            foreach ($this->getProvidedClasses(new \ReflectionClass($className)) as $providingClassName) {
-                $qualifierTags = $definition->getTag('hco.autowire.qualifier');
-                $primaryTags = $definition->getTag('hco.autowire.primary');
-                $isPrimary = count($primaryTags) > 0;
-                $qualifier = count($qualifierTags) > 0 ? reset($qualifierTags)['qualifier'] : null;
-
-                $dependencyRegistry->register($providingClassName, $serviceId, $qualifier, $isPrimary);
-            }
-        }
 
         $taggedServices = $container->findTaggedServiceIds(
             'hco.autowire'
         );
+        $dependencyRegistry = $this->buildDependencyRegistry($container);
 
         foreach ($taggedServices as $serviceId => $tagAttributes) {
             $definition = $container->getDefinition($serviceId);
@@ -123,6 +103,36 @@ class AutoWiringCompilerPass implements CompilerPassInterface
         }
 
         return $parameterNameToQualifierMap;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return DependencyRegistry
+     */
+    private function buildDependencyRegistry(ContainerBuilder $container)
+    {
+        $dependencyRegistry = new DependencyRegistry();
+        foreach ($container->getDefinitions() as $serviceId => $definition) {
+            $className = $container->getParameterBag()->resolveValue(
+                $definition->getClass()
+            );
+
+            if ($className === null) {
+                continue;
+            }
+
+            class_exists($className);
+            foreach ($this->getProvidedClasses(new \ReflectionClass($className)) as $providingClassName) {
+                $qualifierTags = $definition->getTag('hco.autowire.qualifier');
+                $primaryTags   = $definition->getTag('hco.autowire.primary');
+                $isPrimary     = count($primaryTags) > 0;
+                $qualifier     = count($qualifierTags) > 0 ? reset($qualifierTags)['qualifier'] : null;
+
+                $dependencyRegistry->register($providingClassName, $serviceId, $qualifier, $isPrimary);
+            }
+        }
+        return $dependencyRegistry;
     }
 }
 
