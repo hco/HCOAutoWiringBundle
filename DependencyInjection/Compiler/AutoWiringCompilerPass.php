@@ -12,6 +12,19 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * The actual AutoWiring
+ *
+ * This class actually implements the AutoWiring.
+ * It leverages the DependencyRegistry to create a map of classes which are
+ * provided by every service.
+ * It also reads the hco.autowire.qualifier and hco.autowire.primary tags from
+ * the DIC.
+ *
+ * In order to find the classes provided by a service, it walks up the
+ * inheritance chain and looks for all implemented interfaces in a service.
+ * Every class in the inheritance chain will then be added to the DependencyRegistry.
+ */
 class AutoWiringCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

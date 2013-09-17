@@ -3,6 +3,12 @@ namespace HCO\AutoWiringBundle;
 
 use HCO\AutoWiringBundle\Exception;
 
+/**
+ * Provides a map of provided classes to service ids.
+ *
+ * You can register a provided class using the register method and find services that provide a class using the find* methods.
+ * Please see the README.md for an explanation of qualifiers and primary.
+ */
 class DependencyRegistry
 {
     private $storage;
@@ -13,11 +19,14 @@ class DependencyRegistry
     }
 
     /**
+     * Registers a provided class for a give service id.
      *
+     * Only the given class name is registered, not its parent classes.
      *
      * @param $className
      * @param $serviceId
      * @param string $qualifier
+     * @param bool $primary
      */
     public function register($className, $serviceId, $qualifier = null, $primary = false)
     {
@@ -51,6 +60,13 @@ class DependencyRegistry
     }
 
 
+    /**
+     * Find a class without looking for a qualifier.
+     *
+     * Qualified classes will be retrieved, too.
+     *
+     * @param string $className
+     */
     public function findUnqualified($className)
     {
         if (!isset($this->storage[$className])) {
@@ -78,6 +94,14 @@ class DependencyRegistry
         return $this->storage[$className]['unqualified'][0];
     }
 
+    /**
+     * Find a class with a given qualifier.
+     *
+     * Classes which were registered without a qualifier will not be found.
+     *
+     * @param string $className
+     * @param string $qualifier
+     */
     public function findQualified($className, $qualifier)
     {
         if (!isset($this->storage[$className]) || !isset($this->storage[$className]['qualified'][$qualifier])) {
