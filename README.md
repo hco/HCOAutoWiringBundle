@@ -8,7 +8,7 @@ DIC.  The Bundle will then iterate over the constructor-parameters and will try
 to find a service that satisfies the typehint of every parameter.
 
 If there is not exactly one service that satisfies the typehint, the autowiring will fail.
-Qualifiers might help you to solve that issue, though :)
+Qualifiers and Primary Services might help you to solve that issue, though :)
 
 The autowiring process is done during compile time of the service container,
 which means that it **should not have any performance impact** in production.
@@ -23,6 +23,13 @@ You could now give both services a qualifier, "write" for the write-database con
 
 If a service now has an unqualified typehint for a database connection, the autowiring will fail.
 But you can now qualify a typehint with the string we used before, so that a service will be wired to one specific database connection.
+
+## Primary Services
+A service an be tagged to be a so called primary service.
+When a dependency should be outwired, and there is exactly one primary service, that will be outwired.
+There can still be several non-primary services for a class, but they will be ignored.
+
+If two services are declared to be primary which are of the same type, the compilation of the container will fail.
 
 ## Example
 
@@ -93,3 +100,20 @@ class ServiceWithDependency
 </service>
 ```
 This will injcet the service *baz* into the service *foobar*, as *baz* is qualified as *readonly*.
+
+### Example with Primary
+If we tag the service *baz* as primary, it will be used as the StdClass dependency of our *ServiceWithDependency*.
+See the following services.xml as an example.
+```xml
+<services>
+    <service id="foo" class="ServiceWithDependency">
+        <tag name="hco.autowire" />
+    </service>
+    <service id="bar" class="\StdClass">
+    </service>
+    <service id="baz" class="\StdClass">
+        <tag name="hco.autowire.primary" />
+    </service>
+
+</services>
+```
