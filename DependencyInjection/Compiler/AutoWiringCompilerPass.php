@@ -44,11 +44,6 @@ class AutoWiringCompilerPass implements CompilerPassInterface
 
             class_exists($className);
             foreach ($this->getProvidedClasses(new \ReflectionClass($className)) as $providingClassName) {
-                $annotation = $annotationReader->getClassAnnotation(
-                    new \ReflectionClass($className),
-                    'HCO\AutoWiringBundle\Annotation\Qualifier'
-                );
-
                 $qualifierTags = $definition->getTag('hco.autowire.qualifier');
                 $primaryTags = $definition->getTag('hco.autowire.primary');
                 $isPrimary = count($primaryTags) > 0;
