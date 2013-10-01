@@ -1,8 +1,12 @@
 {
     "name": "hco/auto-wiring-bundle",
+    "type": "symfony-bundle",
     "autoload": {
-        "classmap": ["."]
+        "psr-0": {
+            "HCO\\AutoWiringBundle": ""
+        }
     },
+    "target-dir": "HCO/AutoWiringBundle",
     "require": {
         "doctrine/annotations": "1.1.2",
         "symfony/dependency-injection": "2.3",
