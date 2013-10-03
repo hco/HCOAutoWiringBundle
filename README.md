@@ -13,6 +13,12 @@ Qualifiers and Primary Services might help you to solve that issue, though :)
 The autowiring process is done during compile time of the service container,
 which means that it **should not have any performance impact** in production.
 
+## Stability
+
+I already use this bundle in an application, and it's working quite well. I am not yet releasing a 1.0 though, as I'm looking forward to feedback and experiences.
+
+I intend to keep every change **backwards compatible**.
+
 ## Qualifiers
 A service can have a so called "qualifier", which will allow autowiring of typehints which could be
 satisfied by several services.
