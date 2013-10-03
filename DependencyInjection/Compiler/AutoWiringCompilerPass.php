@@ -102,12 +102,15 @@ class AutoWiringCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            class_exists($className);
             foreach ($this->getProvidedClasses(new \ReflectionClass($className)) as $providingClassName) {
-                $qualifierTags = $definition->getTag('hco.autowire.qualifier');
-                $primaryTags   = $definition->getTag('hco.autowire.primary');
-                $isPrimary     = count($primaryTags) > 0;
-                $qualifier     = count($qualifierTags) > 0 ? reset($qualifierTags)['qualifier'] : null;
+                $isPrimary = $definition->hasTag('hco.autowire.primary');
+                $qualifier = null;
+
+                if ($definition->hasTag('hco.autowire.qualifier')) {
+                    $qualifierTags     = $definition->getTag('hco.autowire.qualifier');
+                    $firstQualifierTag = reset($qualifierTags);
+                    $qualifier         = $firstQualifierTag['qualifier'];
+                }
 
                 $dependencyRegistry->register($providingClassName, $serviceId, $qualifier, $isPrimary);
             }
