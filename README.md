@@ -123,3 +123,6 @@ See the following services.xml as an example.
 
 </services>
 ```
+
+# License
+This bundle is under the MIT license. See the complete license in the [LICENSE](https://github.com/hco/HCOAutoWiringBundle/blob/master/LICENSE] file in the root of this repository.
