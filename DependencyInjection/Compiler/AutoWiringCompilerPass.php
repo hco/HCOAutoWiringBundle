@@ -2,7 +2,7 @@
 
 namespace HCO\AutoWiringBundle\DependencyInjection\Compiler;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader as AnnotationReader;
 use HCO\AutoWiringBundle\Annotation\Qualifier;
 use HCO\AutoWiringBundle\Annotation\RequireQualifier;
 use HCO\AutoWiringBundle\DependencyRegistry;
