@@ -6,10 +6,10 @@ use Doctrine\Common\Annotations\Reader as AnnotationReader;
 use HCO\AutoWiringBundle\Annotation\Qualifier;
 use HCO\AutoWiringBundle\Annotation\RequireQualifier;
 use HCO\AutoWiringBundle\DependencyRegistry;
-use Sabre\VObject\Component\VAlarm;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -36,7 +36,7 @@ class AutoWiringCompilerPass implements CompilerPassInterface
 
         foreach ($autoWiredServices as $serviceId) {
             $definition = $container->getDefinition($serviceId);
-            $class      = new \ReflectionClass($definition->getClass());
+            $class      = new \ReflectionClass($this->getClassNameForDefinition($container, $definition));
             $container->addResource(new FileResource($class->getFileName()));
 
             $definition->setArguments(
@@ -94,9 +94,7 @@ class AutoWiringCompilerPass implements CompilerPassInterface
     {
         $dependencyRegistry = new DependencyRegistry();
         foreach ($container->getDefinitions() as $serviceId => $definition) {
-            $className = $container->getParameterBag()->resolveValue(
-                $definition->getClass()
-            );
+            $className = $this->getClassNameForDefinition($container, $definition);
 
             if ($className === null) {
                 continue;
@@ -165,6 +163,13 @@ class AutoWiringCompilerPass implements CompilerPassInterface
             }
         }
         return $newArguments;
+    }
+
+    private function getClassNameForDefinition(ContainerBuilder $containerBuilder, Definition $definition)
+    {
+        return $containerBuilder->getParameterBag()->resolveValue(
+            $definition->getClass()
+        );
     }
 }
 
