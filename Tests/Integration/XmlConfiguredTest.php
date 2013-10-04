@@ -66,6 +66,20 @@ class XmlConfiguredTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testQualifiedUsingXml()
+    {
+        $loader = new XmlFileLoader($this->containerBuilder, new FileLocator(__DIR__ . '/XmlConfigurations'));
+        $loader->load('qualified_using_xml.xml');
+
+        $this->compile();
+
+        $this->assertSame(
+            $this->containerBuilder->get('baz'),
+            $this->containerBuilder->get('foo')->stdObject
+        );
+    }
+
+
     private function compile()
     {
         $compilerPass = new AutoWiringCompilerPass();

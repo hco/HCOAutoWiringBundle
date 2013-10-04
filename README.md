@@ -107,6 +107,20 @@ class ServiceWithDependency
 ```
 This will injcet the service *baz* into the service *foobar*, as *baz* is qualified as *readonly*.
 
+Qualifiers can also be configured within the XML:
+
+```xml
+<service id="foo" class="ServiceWithDependency">
+    <tag name="hco.autowire"/>
+    <tag name="hco.autowire.require_qualifier" param="stdObject" qualifier="readonly"/>
+</service>
+<service id="bar" class="StdClass">
+</service>
+<service id="baz" class="StdClass">
+    <tag name="hco.autowire.qualifier" qualifier="readonly"/>
+</service>
+```
+
 ### Example with Primary
 If we tag the service *baz* as primary, it will be used as the StdClass dependency of our *ServiceWithDependency*.
 See the following services.xml as an example.

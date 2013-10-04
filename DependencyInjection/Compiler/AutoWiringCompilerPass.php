@@ -41,7 +41,7 @@ class AutoWiringCompilerPass implements CompilerPassInterface
 
             if($class->getConstructor() !== null) {
                 $definition->setArguments(
-                    $this->getAutowiredArguments($annotationReader, $class, $dependencyRegistry)
+                    $this->getAutowiredArguments($annotationReader, $class, $definition, $dependencyRegistry)
                 );
             }
         }
@@ -65,7 +65,11 @@ class AutoWiringCompilerPass implements CompilerPassInterface
      * @param $annotationReader
      * @param $class
      */
-    private function getQualifiersForParameters(AnnotationReader $annotationReader, \ReflectionClass $class)
+    private function getQualifiersForParameters(
+        AnnotationReader $annotationReader,
+        \ReflectionClass $class,
+        Definition $definition
+    )
     {
         /** @var RequireQualifier[] $annotations */
         $annotations = array_filter(
@@ -77,11 +81,14 @@ class AutoWiringCompilerPass implements CompilerPassInterface
             }
         );
 
-
         $parameterNameToQualifierMap = array();
 
         foreach ($annotations as $annotation) {
             $parameterNameToQualifierMap[$annotation->param] = $annotation->qualifier;
+        }
+
+        foreach ($definition->getTag('hco.autowire.require_qualifier') as $tag) {
+            $parameterNameToQualifierMap[$tag['param']] = $tag['qualifier'];
         }
 
         return $parameterNameToQualifierMap;
@@ -142,11 +149,12 @@ class AutoWiringCompilerPass implements CompilerPassInterface
     private function getAutowiredArguments(
         AnnotationReader $annotationReader,
         \ReflectionClass $class,
+        Definition $definition,
         DependencyRegistry $dependencyRegistry
     ) {
         $newArguments = array();
 
-        $qualifiers = $this->getQualifiersForParameters($annotationReader, $class);
+        $qualifiers = $this->getQualifiersForParameters($annotationReader, $class, $definition);
 
         foreach ($class->getConstructor()->getParameters() as $parameter) {
             if (isset($qualifiers[$parameter->getName()])) {
