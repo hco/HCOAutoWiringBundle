@@ -121,6 +121,8 @@ Qualifiers can also be configured within the XML:
 </service>
 ```
 
+Something similar will work with YAML, as i just use tags on services.
+
 ### Example with Primary
 If we tag the service *baz* as primary, it will be used as the StdClass dependency of our *ServiceWithDependency*.
 See the following services.xml as an example.
