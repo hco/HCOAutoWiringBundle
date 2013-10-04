@@ -180,6 +180,25 @@ class AutoWiringTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAutowiringWithoutConstructor()
+    {
+        $definition = new Definition(
+            '\StdClass'
+        );
+        $definition->addTag(
+            'hco.autowire'
+        );
+
+        $this->containerBuilder->setDefinition('service_without_constructor', $definition);
+
+        $this->compile();
+
+        $this->assertInstanceOf(
+            'StdClass',
+            $this->containerBuilder->get('service_without_constructor')
+        );
+    }
+
     private function compile()
     {
         $compilerPass = new AutoWiringCompilerPass();

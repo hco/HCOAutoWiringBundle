@@ -39,9 +39,11 @@ class AutoWiringCompilerPass implements CompilerPassInterface
             $class      = new \ReflectionClass($this->getClassNameForDefinition($container, $definition));
             $container->addResource(new FileResource($class->getFileName()));
 
-            $definition->setArguments(
-                $this->getAutowiredArguments($annotationReader, $class, $dependencyRegistry)
-            );
+            if($class->getConstructor() !== null) {
+                $definition->setArguments(
+                    $this->getAutowiredArguments($annotationReader, $class, $dependencyRegistry)
+                );
+            }
         }
     }
 
